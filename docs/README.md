@@ -25,11 +25,23 @@ yarn global add testapi6-mongo
     modules:
       - testapi6-mongo/dist/index.js
 - Mongo:
-    connection: mongo://localhost:6379
-    commands: 
+    title: Mongo localhost
+    connection: mongodb://localhost:49277
+    config:
+      db: user
+      auth:
+        user: user
+        password: ******
+      useUnifiedTopology: true
+    queries: 
+      - db.drop()
+      - title: Show tables
+        query: db.listCollections()
       - title: Get users
-        command: 
-          - get
-          - users
-        var: rs
+        query: db.col('User').find(?, ??)
+        args:
+          - name: 'thanh' # Replace data to ?
+          - username: 1   # Replace data to ??, its auto convert to { projection: ? }
+            age: 1
+        var: users
 ```
