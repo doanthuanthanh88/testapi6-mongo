@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "anyOf": [
+    {
+      "$ref": "#/definitions/Mongo"
+    }
+  ],
+  "definitions": {
+    "Mongo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Mongo": {
+          "type": "object",
+          "description": "Execute mongo query",
+          "additionalProperties": false,
+          "properties": {
+            "disabled": {
+              "type": [
+                "boolean",
+                "string"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "description": "Description"
+            },
+            "connection": {
+              "type": "string",
+              "description": "Mongo connection uri",
+              "examples": [
+                "mongodb://localhost:27017"
+              ]
+            },
+            "config": {
+              "type": "object",
+              "description": "Mongo configuration",
+              "properties": {
+                "db": {
+                  "description": "Database name",
+                  "type": "string"
+                },
+                "auth": {
+                  "description": "Authentication",
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "useUnifiedTopology": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "queries": {
+              "type": "array",
+              "description": "Mongo queries",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "description": "Query command",
+                    "examples": [
+                      "db.listCollections()",
+                      "db.col('COLLECTION_NAME').find()",
+                      "db.drop()"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "query": {
+                        "type": "string",
+                        "description": "Query command",
+                        "examples": [
+                          "db.listCollections()",
+                          "db.col('COLLECTION_NAME').find(?, ??); \n? for object\n?? for select fields. which be copied from 'args' fields",
+                          "db.drop()"
+                        ]
+                      },
+                      "args": {
+                        "type": "array",
+                        "items": {
+                          "type": [
+                            "string",
+                            "array",
+                            "boolean",
+                            "number",
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "description": "Aggruments for query command",
+                        "examples": [
+                          "db.listCollections()",
+                          "db.col('COLLECTION_NAME').find(?, ??); \n? for object\n?? for select fields. which be copied from 'args' fields",
+                          "db.drop()"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
