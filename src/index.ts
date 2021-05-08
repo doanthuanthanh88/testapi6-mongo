@@ -1,4 +1,4 @@
-export * from './Mongo'
+export { Mongo } from './Mongo'
 
 // import { Mongo } from './Mongo'
 

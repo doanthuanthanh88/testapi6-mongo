@@ -1,6 +1,8 @@
 import { Cursor, Db, MongoClient } from 'mongodb'
 import chalk from 'chalk'
 import { Tag } from 'testapi6/dist/components/Tag'
+import { parse } from 'querystring'
+import { merge } from 'lodash'
 
 /**
  * Mongo query
@@ -70,10 +72,17 @@ export class Mongo extends Tag {
 
   async beforeExec() {
     await super.beforeExec()
-    const { db, ...config } = this.config
+    let { db, ...config } = this.config
+    const [uri = '', q = ''] = this.connection.split('?')
+    config = merge({}, parse(q), config)
+    if (!db) {
+      db = uri.substr(uri.lastIndexOf('/') + 1)
+      this.connection = uri.substr(0, uri.lastIndexOf('/'))
+    }
+    if (!db) throw new Error('Database is required')
     this._db = new MongoClient(this.connection, config as any)
     await this._db.connect()
-    this.db = this._db.db(db)
+    this.db = this._db.db(db || undefined)
   }
 
   async exec() {
