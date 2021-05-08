@@ -64,7 +64,7 @@ export class Mongo extends Tag {
 
   constructor(attrs: Mongo) {
     super(attrs)
-    if (!this.config) this.config = {} as any
+    if (!this.config) this.config = { useUnifiedTopology: true } as any
     if (!this.queries) this.queries = []
   }
 
@@ -123,7 +123,7 @@ export class Mongo extends Tag {
             this.context.log(chalk.yellow('%s'), this.context.Utils.json(res.result))
           }
         }
-        if (query.var) this.setVar(query.var, res)
+        if (query.var) this.setVar(query.var, res.result)
         if (!this.slient && query.title) this.context.groupEnd()
       }
     } finally {
