@@ -1,4 +1,4 @@
-import { Cursor, Db, MongoClient } from 'mongodb'
+import { Cursor, Db, MongoClient, ObjectID as OID } from 'mongodb'
 import chalk from 'chalk'
 import { Tag } from 'testapi6/dist/components/Tag'
 import { parse } from 'querystring'
@@ -72,17 +72,22 @@ export class Mongo extends Tag {
 
   async beforeExec() {
     await super.beforeExec()
-    let { db, ...config } = this.config
+    let { db = undefined, ...config } = this.config
     const [uri = '', q = ''] = this.connection.split('?')
     config = merge({}, parse(q), config)
-    if (!db) {
-      db = uri.substr(uri.lastIndexOf('/') + 1)
-      this.connection = uri.substr(0, uri.lastIndexOf('/'))
-    }
-    if (!db) throw new Error('Database is required')
+    this.connection = uri
     this._db = new MongoClient(this.connection, config as any)
     await this._db.connect()
     this.db = this._db.db(db || undefined)
+  }
+
+  prepare(scope, ignore) {
+    super.prepare(scope, ignore)
+    // @ts-ignore
+    const ObjectID = OID
+    // @ts-ignore
+    const ObjectId = OID
+    this.queries.forEach(q => this.replaceVars(q, { ...this.context, ObjectID, ObjectId }))
   }
 
   async exec() {
