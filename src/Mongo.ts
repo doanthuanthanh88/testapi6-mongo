@@ -81,15 +81,6 @@ export class Mongo extends Tag {
     this.db = this._db.db(db || undefined)
   }
 
-  prepare(scope, ignore) {
-    super.prepare(scope, ignore)
-    // @ts-ignore
-    const ObjectID = OID
-    // @ts-ignore
-    const ObjectId = OID
-    this.queries.forEach(q => this.replaceVars(q, { ...this.context, ObjectID, ObjectId }))
-  }
-
   async exec() {
     if (!this.slient && this.title) this.context.group(chalk.green('%s'), this.title)
     try {
@@ -122,6 +113,10 @@ export class Mongo extends Tag {
           .replace(new RegExp(rd1, 'g'), () => `${i++}`)
         const begin = Date.now()
         let t: any
+        // @ts-ignore
+        const ObjectID = OID
+        // @ts-ignore
+        const ObjectId = OID
         eval(`t = ${func}`)
         let rs = await t
         if (rs instanceof Cursor) {
