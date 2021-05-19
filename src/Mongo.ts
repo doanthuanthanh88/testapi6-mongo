@@ -74,8 +74,20 @@ export class Mongo extends Tag {
     await super.beforeExec()
     let { db = undefined, ...config } = this.config
     const [uri = '', q = ''] = this.connection.split('?')
+    const m = uri.match(/^mongodb:\/\/(([^:]+):?([^@]+)@)?([^\/]+)\/?(.*)/)
+    if (!m) throw new Error('Connection is not valid')
+
+
     config = merge({}, parse(q), config)
-    this.connection = uri
+    this.connection = 'mongodb://' + m[4]
+    if (m[1]) {
+      config.auth = {
+        user: m[2],
+        password: m[3]
+      }
+    }
+    db = m[5]
+    console.log(this.connection, config, db)
     this._db = new MongoClient(this.connection, config as any)
     await this._db.connect()
     this.db = this._db.db(db || undefined)
