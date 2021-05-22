@@ -4,12 +4,13 @@ export { Mongo } from './Mongo'
 
 // async function main() {
 //   const m = new Mongo({
-//     connection: 'mongodb://root:example@localhost:49277/periodic-survey',
+//     connection: 'mongodb://gapo-periodic-survey:Zk9O1QzyQ7DNRocXTJSiLbuWa3C4gcZn@10.148.0.14:27017/gapo-periodic-survey',
+//     autoParse: false,
 //     // config: {
-//     //   db: 'periodic-survey',
+//     //   db: 'gapo-periodic-survey',
 //     //   auth: {
-//     //     user: 'root',
-//     //     password: 'example'
+//     //     user: 'gapo-periodic-survey',
+//     //     password: 'Zk9O1QzyQ7DNRocXTJSiLbuWa3C4gcZn'
 //     //   },
 //     //   useUnifiedTopology: true
 //     // },
