@@ -42,6 +42,7 @@ export class Mongo extends Tag {
    */
   config: Partial<{
     /** Mongo db */
+    uri: string
     db: string
     auth?: {
       user: string
@@ -73,21 +74,24 @@ export class Mongo extends Tag {
   async beforeExec() {
     await super.beforeExec()
     let { db = undefined, ...config } = this.config
-    const [uri = '', q = ''] = this.connection.split('?')
-    const m = uri.match(/^mongodb:\/\/(([^:]+):?([^@]+)@)?([^\/]+)\/?(.*)/)
-    if (!m) throw new Error('Connection is not valid')
+    if (this.connection) {
+      const [uri = '', q = ''] = this.connection.split('?')
+      const m = uri.match(/^mongodb:\/\/(([^:]+):?([^@]+)@)?([^\/]+)\/?(.*)/)
+      if (!m) throw new Error('Connection is not valid')
 
 
-    config = merge({}, parse(q), config)
-    this.connection = 'mongodb://' + m[4]
-    if (m[1]) {
-      config.auth = {
-        user: m[2],
-        password: m[3]
+      config = merge({}, parse(q), config)
+      this.connection = 'mongodb://' + m[4]
+      if (m[1]) {
+        config.auth = {
+          user: m[2],
+          password: m[3]
+        }
       }
+      db = m[5]
+    } else if (this.config.uri) {
+      this.connection = this.config.uri
     }
-    db = m[5]
-    console.log(this.connection, config, db)
     this._db = new MongoClient(this.connection, config as any)
     await this._db.connect()
     this.db = this._db.db(db || undefined)
