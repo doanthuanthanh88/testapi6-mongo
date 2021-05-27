@@ -1,8 +1,8 @@
-import { Cursor, Db, MongoClient, ObjectID as OID } from 'mongodb'
 import chalk from 'chalk'
-import { Tag } from 'testapi6/dist/components/Tag'
-import { parse } from 'querystring'
 import { merge } from 'lodash'
+import { Cursor, Db, MongoClient, ObjectID as OID } from 'mongodb'
+import { parse } from 'querystring'
+import { Tag } from 'testapi6/dist/components/Tag'
 
 /**
  * Mongo query
@@ -71,27 +71,58 @@ export class Mongo extends Tag {
     if (!this.queries) this.queries = []
   }
 
+  private getConfigAutoParse(m: any[]) {
+    const connection = 'mongodb://' + m[4]
+    const config = {} as any
+    let mydb: string
+    if (m[1]) {
+      config.auth = {
+        user: m[2],
+        password: m[3]
+      }
+    }
+    mydb = m[5]
+    return { connection, config, mydb }
+  }
+
   async beforeExec() {
     await super.beforeExec()
-    let { db = undefined, ...config } = this.config
-    const [uri = '', q = ''] = this.connection.split('?')
-    const m = uri.match(/^mongodb:\/\/(([^:]+):?([^@]+)@)?([^\/]+)\/?(.*)/)
-    if (!m) throw new Error('Connection is not valid')
+    if (this.id && Tag.Cached.has(this.id)) {
+      const obj = Tag.Cached.get(this.id) as any
+      this._db = obj._db
+      this.db = obj.db
+      this.title = this.title || obj.title
+    } else {
+      let { db = undefined, ...config } = this.config
+      const [uri = '', q = ''] = this.connection.split('?')
+      const m = uri.match(/^mongodb:\/\/(([^:]+):?([^@]+)@)?([^\/]+)\/?(.*)/)
+      if (!m) throw new Error('Connection is not valid')
 
-    config = merge({}, parse(q), config)
-    if (this.autoParse) {
-      this.connection = 'mongodb://' + m[4]
-      if (m[1]) {
-        config.auth = {
-          user: m[2],
-          password: m[3]
+      config = merge({}, parse(q), config)
+      if (this.autoParse) {
+        const { connection, config, mydb } = this.getConfigAutoParse(m)
+        this.connection = connection
+        merge(this.config, config)
+        db = mydb
+      }
+      try {
+        this._db = new MongoClient(this.connection, config as any)
+        await this._db.connect()
+      } catch {
+        if (this.autoParse === undefined) {
+          const { connection, config, mydb } = this.getConfigAutoParse(m)
+          this.connection = connection
+          merge(this.config, config)
+          this._db = new MongoClient(this.connection, config as any)
+          db = mydb
+          await this._db.connect()
         }
       }
-      db = m[5]
+      this.db = this._db.db(db || undefined)
+      if (this.id && !Tag.Cached.has(this.id)) {
+        Tag.Cached.set(this.id, this)
+      }
     }
-    this._db = new MongoClient(this.connection, config as any)
-    await this._db.connect()
-    this.db = this._db.db(db || undefined)
   }
 
   async exec() {
@@ -127,6 +158,8 @@ export class Mongo extends Tag {
         const begin = Date.now()
         let t: any
         // @ts-ignore
+        const $ = OID
+        // @ts-ignore
         const ObjectID = OID
         // @ts-ignore
         const ObjectId = OID
@@ -154,6 +187,6 @@ export class Mongo extends Tag {
   }
 
   async dispose() {
-    await this._db.close()
+    await this._db?.close()
   }
 }
