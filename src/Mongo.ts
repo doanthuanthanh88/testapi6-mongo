@@ -29,6 +29,7 @@ export class MongoQuery {
  * Execute mongo query
  */
 export class Mongo extends Tag {
+  static ignore = [...Tag.ignores, 'db']
   /** 
    * Mongo connection string 
    * 
@@ -65,8 +66,8 @@ export class Mongo extends Tag {
   _db: MongoClient
   db: Db
 
-  constructor(attrs: Mongo) {
-    super(attrs)
+  init(attrs: Mongo) {
+    super.init(attrs)
     if (!this.config) this.config = { useUnifiedTopology: true } as any
     if (!this.queries) this.queries = []
   }
@@ -174,8 +175,10 @@ export class Mongo extends Tag {
         }
         if (!this.slient) {
           this.context.log(`${chalk.green('%s')} ${chalk.gray('- %dms')}`, query.query, res.time)
-          if (res.result) {
+          if (res.result && typeof res.result === 'object') {
             this.context.log(chalk.yellow('%s'), this.context.Utils.json(res.result))
+          } else {
+            this.context.log(chalk.yellow('%s'), res.result)
           }
         }
         if (query.var) this.setVar(query.var, res.result)
