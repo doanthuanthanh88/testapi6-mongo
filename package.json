@@ -1,8 +1,11 @@
 {
   "name": "testapi6-mongo",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Execute mongo query",
   "main": "dist/index.js",
+  "bin": {
+    "testapi6-mongo": "./bin/index.js"
+  },
   "scripts": {
     "doc": "typedoc --tsconfig tsconfig.doc.json --watch src/index.ts",
     "build:doc": "rm -rf docs && typedoc --plugin typedoc-plugin-markdown --tsconfig tsconfig.doc.json src/index.ts",
@@ -15,7 +18,8 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "lodash": "^4.17.21",
-    "mongodb": "^3.6.5"
+    "mongodb": "^3.6.5",
+    "yarn-global-modules": "^1.0.1"
   },
   "readme": "./docs/README.md",
   "homepage": "https://github.com/doanthuanthanh88",
