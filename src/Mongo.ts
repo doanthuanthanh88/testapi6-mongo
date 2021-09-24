@@ -29,6 +29,27 @@ export class MongoQuery {
  * Execute mongo query
  */
 export class Mongo extends Tag {
+  static get des() {
+    return `Execute queries to mongo database`
+  }
+  static get example() {
+    return `# Read more configuration: https://www.npmjs.com/package/mongodb
+- testapi6-mongo.Mongo:
+    title: Mongo localhost
+    connection: mongodb://user:******@127.0.0.1:27017/database_name
+    queries: 
+      - db.drop()         # Query string
+      - title: Show tables
+        query: db.listCollections()
+      - title: Get users
+        query: db.col('User').find(?, ??)
+        args:
+          - name: 'thanh' # Replace data to ?
+          - username: 1   # Replace data to ??, its auto convert to { projection: ? }
+            age: 1
+        var: users
+`
+  }
   static ignore = [...Tag.ignores, 'db']
   /** 
    * Mongo connection string 

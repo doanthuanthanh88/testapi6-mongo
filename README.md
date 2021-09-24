@@ -16,21 +16,14 @@ npm install -g testapi6-mongo
 yarn global add testapi6-mongo
 ```
 
+# Configuration
+Read [mongodb](https://www.npmjs.com/package/mongodb)
+
 ### Use in yaml
 ```yaml
-- Require:
-    root: path_to_this_modules
-    modules:
-      - testapi6-mongo/dist/index.js
-- Mongo:
+- testapi6-mongo.Mongo:
     title: Mongo localhost
-    connection: mongodb://localhost:49277
-    config:
-      db: user
-      auth:
-        user: user
-        password: ******
-      useUnifiedTopology: true
+    connection: mongodb://user:******@127.0.0.1:27017/database_name
     queries: 
       - db.drop()
       - title: Show tables
